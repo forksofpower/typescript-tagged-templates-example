@@ -1,7 +1,11 @@
-export function interpolateStrings<T>(
+type Interpolations<TParams> = Array<
+  string | ((ctx: TParams) => string | number)
+>;
+
+export function interpolateStrings<TParams>(
   strings: TemplateStringsArray,
-  interpolations: Array<string | ((ctx: T) => string | number)>,
-  templateParams: T
+  interpolations: Interpolations<TParams>,
+  templateParams: TParams
 ) {
   return strings.reduce((acc, str, index) => {
     acc += str;
@@ -22,7 +26,7 @@ export function interpolateStrings<T>(
 export function createTagFunction(cb?: (output: string) => any) {
   return <TParams>(
     strings: TemplateStringsArray,
-    ...interpolations: Array<string | ((ctx: TParams) => string | number)>
+    ...interpolations: Interpolations<TParams>
   ) => {
     return (templateParams: TParams) => {
       const output = interpolateStrings(
