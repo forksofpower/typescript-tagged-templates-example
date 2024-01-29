@@ -1,53 +1,73 @@
-import chalk from "chalk";
-import yaml, { Document } from "yaml";
-import { createStringTemplate } from "./generic.js";
-import { yml } from "./yaml.js";
+import chalk from 'chalk';
+import yaml from 'yaml';
+import { createTagFunction } from './tag-function.js';
+import { highlight } from 'cli-highlight';
 
+/**
+ * Utils
+ */
 function printHeading(s: string) {
   console.log(chalk.magenta(s));
 }
+function printHtml(s: string) {
+  console.log(highlight(s, { language: 'html' }));
+}
+function printYaml(s: string) {
+  console.log(highlight(s, { language: 'yaml' }));
+}
 
-const htmlTemplate = createStringTemplate<{ title: string }>`
+/**
+ * Template factories
+ */
+export const htmlTemplate = createTagFunction();
+export const yamlTemplate = createTagFunction(output => ({
+  yaml: output,
+  json: yaml.parse(output),
+}));
+
+/**
+ * Typed Templates
+ */
+const htmlDoc = htmlTemplate<{ title: string }>`
   <html>
     <head>
-      <title>${(t) => t.title}</title>
+      <title>${t => t.title}</title>
     </head>
     <body>
-      <h1>${(t) => t.title}</h1>
+      <h1>${t => t.title}</h1>
     </body>
   </html>
 `;
 
-const html = htmlTemplate({ title: "TESTING" });
-printHeading("HTML output:");
-console.log(html);
-
-/* Yaml Example */
-const yamlTemplate = yml<{
+interface User {
   occupation: string;
   city: string;
   id: number;
   friends: number[];
-}>`
+}
+const userYaml = yamlTemplate<User>`
+  id: ${t => t.id}
   name: Patrick
   age: 30
-  occupation: ${(t) => t.occupation}
+  occupation: ${t => t.occupation}
   address:
-    city: ${(t) => t.city}
+    city: ${t => t.city}
     state: Texas
-  id: ${(t) => t.id}
   # yaml can be injected from an interpolation function
   ${({ friends }) => yaml.stringify({ friends })}
 `;
 
-const user = yamlTemplate({
-  occupation: "Software Engineer",
-  city: "El Paso",
+// Usage examples
+const html = htmlDoc({ title: 'TESTING' });
+
+const user = userYaml({
+  occupation: 'Software Engineer',
+  city: 'El Paso',
   id: 34253254234,
   friends: [234234, 345345, 567567],
 });
 
-printHeading("Yaml output:");
-console.log(user.yaml);
-printHeading("Parsed JSON:");
-console.log(user.json);
+printHeading('HTML');
+printHtml(html);
+printHeading('Yaml');
+printYaml(user.yaml);

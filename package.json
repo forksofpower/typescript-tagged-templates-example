@@ -11,10 +11,18 @@
   "license": "ISC",
   "dependencies": {
     "chalk": "^5.3.0",
+    "cli-highlight": "^2.1.11",
     "yaml": "^2.3.4"
   },
   "devDependencies": {
     "@types/node": "^20.4.1",
     "typescript": "^5.3.3"
+  },
+  "prettier": {
+    "trailingComma": "es5",
+    "tabWidth": 2,
+    "semi": true,
+    "arrowParens": "avoid",
+    "singleQuote": true
   }
 }
