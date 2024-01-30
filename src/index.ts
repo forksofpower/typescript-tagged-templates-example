@@ -20,6 +20,7 @@ function printYaml(s: string) {
  * Template factories
  */
 export const htmlTemplate = createTagFunction();
+// pass a callback to mutate the output
 export const yamlTemplate = createTagFunction(output => ({
   yaml: output,
   json: yaml.parse(output),
